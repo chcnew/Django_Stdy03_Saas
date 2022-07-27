@@ -1,0 +1,102 @@
+{% extends "web/tpls/manage.html" %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/editor-md/css/editormd.min.css' %}">
+{% endblock %}
+
+{% block container %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-6">
+                    <i class="fa fa-
+                    book" aria-hidden="true"></i> Wiki文章
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <div class="col-md-3 title-list">
+                <ul id="catalog"></ul>
+            </div> <!--目录-->
+
+            <div class="col-md-9 content-wiki">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% for field in form %}
+                        {% if field.name == "content" %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                <div id="editor">{{ field }}</div>
+                                <span class="error-msg">{{ field.errors.0 }}</span>
+                            </div>
+                        {% else %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                <span class="error-msg">{{ field.errors.0 }}</span>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </form> <!--wiki新建表单-->
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static 'plugins/editor-md/editormd.min.js' %}"></script>
+
+    <script type="text/javascript">
+        //定义全局变量为wiki首页url /web/manage/3/wiki/  后边直接传入文档id
+        var MANAGE_WIKI_URL = "{% url 'manage_wiki' project_id=request.tracer.project.id %}";
+        var UPLOAD_WIKI_URL = "{% url 'wiki_upload' project_id=request.tracer.project.id %}";
+
+        $(function () {
+            initCataclog();
+            ininEditorMd();
+        })
+
+        //Markdown初始化
+        function ininEditorMd() {
+            editormd("editor", {
+                placeholder: "Markdown Editor",
+                height: 560, //指定高度
+                path: "{% static 'plugins/editor-md/lib/' %}",  //必须指定依赖文件位置（切记最后/结尾）
+                imageUpload: true,  //显示本地上传按钮
+                imageFormats: ["png", "jpg", "jpeg", "gif", "webp"],  //可以上传的文件类型
+                imageUploadURL: UPLOAD_WIKI_URL,  //上传url，post请求
+            })
+        }
+
+
+        //目录
+        function initCataclog() {
+            $.ajax({
+                url: "{% url "wiki_catalog" project_id=request.tracer.project.id %}",
+                type: 'get',
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res.status) {
+                        $.each(res.data, function (index, item) {
+                            //console.log(item.id)
+                            var href = MANAGE_WIKI_URL + "?wiki_id=" + item.id
+                            var li = $("<li>").attr("id", "id_" + item.id).append($("<a>").attr("href", href).text(item.title)).append($("<ul>"));
+                            if (!item.parent) {
+                                $("#catalog").append(li);
+                            } else {
+                                $("#id_" + item.parent).children("ul").append(li);
+                            }
+                        });
+                    } else {
+                        alert("初始化目录列表失败，请重新进入...");
+                    }
+                }
+            })
+        }
+    </script>
+
+{% endblock %}

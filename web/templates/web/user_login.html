@@ -1,0 +1,83 @@
+{% extends 'web/tpls/layout.html' %}
+{% load static %}
+
+{% block title %}/密码登录{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/reglogin.css' %}">
+{% endblock %}
+
+{% block container %}
+    <div class="account">
+        <form class="form-set-input" id="login-form" novalidate>
+            <h2 class="form-signin-heading text-center">登 录</h2>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                {{ form.username }}
+                <span class="error-msg"></span>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                {{ form.password }}
+                <span class="error-msg"></span>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-7">
+                        <label for="{{ form.imgcode.id_for_label }}">{{ form.imgcode.label }}</label>
+                        {{ form.imgcode }}
+                        <span class="error-msg"></span>
+                    </div>
+                    <div class="col-md-3 text-right" style="padding-right: 0">
+                        <img class="verification imgcode" title="点击更换验证码" src="{% url 'user_imgcode' %}" alt="验证码图片" onclick="this.setAttribute('src','{% url 'user_imgcode' %}?nocache='+Math.random());"/>
+                    </div> <!--验证码-->
+                </div>
+            </div>
+        </form>
+        <div class="form-signin">
+            <button class="btn btn-lg btn-primary btn-block" id="subbtn">登 录</button>
+        </div>
+
+        <!--跳转a标签-->
+        <div class="form-signin row-no-gutters">
+            <div class="col-md-6 text-left">
+                <a href="#">忘记密码?</a>
+            </div>
+            <div class="col-md-6 text-right">
+                <a href="{% url 'sms_login' %}">短信验证码登录？</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            btn1Event()
+        })
+
+        function btn1Event() {
+            $("#subbtn").click(function () {
+                $(".error-msg").text("")
+                $.ajax({
+                    url: "{% url 'user_login' %}",
+                    type: 'post',
+                    data: $("#login-form").serialize(),
+                    dataType: 'JSON',
+                    success: function (res) {
+                        if (res.status) {
+                            location.href = "{% url 'project_list' %}"
+                        } else {
+                            $.each(res.errors, function (name, data) {
+                                $("#id_" + name).next().text(data[0])
+                            })
+                        }
+                    }
+                })
+            })
+        }
+
+    </script>
+{% endblock %}
+

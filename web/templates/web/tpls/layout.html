@@ -1,0 +1,69 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- 使用X-UA-Compatible设置IE兼容模式 最新渲染模式 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SAAS平台{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/font-awesome/css/font-awesome.css' %}">
+    {% block css %}
+    {% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'home_index' %}">TRACER首页</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="#">产品功能 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">企业方案</a></li>
+                <li><a href="#">帮助文档</a></li>
+                <li><a href="#">价格概述</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if not request.session.userinfo.username %}
+                    <li><a href="{% url 'sms_login' %}">登 录</a></li>
+                    <li><a href="{% url 'user_register' %}">注 册</a></li>
+                {% else %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ request.session.userinfo.username }} <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{% url "project_list" %}">项目管理</a></li>
+                            <li><a href="{% url "user_setting" %}">个人中心</a></li>
+                            <li><a href="{% url 'user_logout' %}">注销登录</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav> <!--导航条-->
+{% block content %}{% endblock %}
+
+<div class="container">
+    {% block container %}{% endblock %}
+</div>
+</body>
+
+<!-- 如果使用插件，必须引入jQuery -->
+<script type="text/javascript" src="{% static 'plugins/jquery/jquery-3.6.0.min.js' %}"></script>
+<!-- 包括所有的bootstrap的js插件或者可以根据需要调用js插件调用 -->
+<script type="text/javascript" src="{% static 'plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+
+{% block js %}
+{% endblock %}
+</html>

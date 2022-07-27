@@ -1,0 +1,14 @@
+<!--设置菜单跳转-->
+{% for item in data_lst %}
+    <div>
+        <a href="{{ item.url }}"
+                {% if item.class %}
+                    class="list-group-item choose"
+                {% else %}
+                    class="list-group-item"
+                {% endif %}
+        >
+        <span>{{ item.title }}</span>
+        </a>
+    </div>
+{% endfor %}

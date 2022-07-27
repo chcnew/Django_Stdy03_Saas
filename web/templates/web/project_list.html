@@ -1,0 +1,195 @@
+{% extends "web/tpls/manage.html" %}
+{% load static %}
+
+{% block container %}
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#myModal">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> 新建项目
+    </button>
+
+    <div class="panel panel-success" style="margin-top: 10px">
+        <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-star" aria-hidden="true"></i> <strong>星标项目</strong></h3>
+        </div>
+        <div class="panel-body">
+            {% for project_item in project_dict.star %}
+                <div class="set-margin">
+                    <div class="project_item">
+                        <a href="{% url 'manage_dashboard' project_id=project_item.id %}" class="title"
+                           style="background-color: {{ project_item.get_color_display }};">{{ project_item.project_name }}</a>
+                        <div class="info">
+                            <div>
+                                <a href="{% url 'project_star' project_type='my' project_id=project_item.id tf='false' %}">
+                                    <i class="fa fa-star off-star" aria-hidden="true" title="取消星标"></i>
+                                </a>
+                                <span>{{ project_item.creator.username }}</span>
+                            </div>
+                            <div>
+                                <i class="fa fa-user-o" aria-hidden="true"></i>
+                                <span>{{ project_item.member_num }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-list-alt" aria-hidden="true"></i> <strong>我的创建</strong></h3>
+        </div>
+        <div class="panel-body">
+            {% for project_item in project_dict.my %}
+                <div class="project_item">
+                    <a href="{% url 'manage_dashboard' project_id=project_item.id %}" class="title"
+                       style="background-color: {{ project_item.get_color_display }};">{{ project_item.project_name }}</a>
+                    <div class="info">
+                        <div>
+                            <a href="{% url 'project_star' project_type='my' project_id=project_item.id tf='true' %}">
+                                <i class="fa fa-star on-star" aria-hidden="true" title="点击星标"></i>
+                            </a>
+                            <span>{{ project_item.creator.username }}</span>
+                        </div>
+                        <div>
+                            <i class="fa fa-user-o" aria-hidden="true"></i>
+                            <span>{{ project_item.member_num }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-handshake-o" aria-hidden="true"></i> <strong>我的参与</strong></h3>
+        </div>
+        <div class="panel-body">
+            {% for project_item in project_dict.join %}
+                <div class="set-margin">
+                    <div class="project_item">
+                        <a href="{% url 'manage_dashboard' project_id=project_item.id %}" class="title"
+                           style="background-color: {{ project_item.get_color_display }};">{{ project_item.project_name }}</a>
+                        <div class="info">
+                            <div>
+                                <a href="{% url 'project_star' project_type='my' project_id=project_item.id tf='true' %}">
+                                    <i class="fa fa-star on-star" aria-hidden="true" title="点击星标"></i>
+                                </a>
+                                <span>{{ project_item.creator.username }}</span>
+                            </div>
+                            <div>
+                                <i class="fa fa-user-o" aria-hidden="true"></i>
+                                <span>{{ project_item.member_num }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">新建项目</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="add_form" novalidate>
+                        {% for field in form %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                <span class="error-msg"></span>
+                            </div>
+                        {% endfor %}
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="btn_close">关 闭</button>
+                    <button type="button" class="btn btn-primary" id="btn_save">保 存</button>
+                </div>
+            </div>
+
+            <div id="loading" class="submit_loading" style="display: none">
+                <div class="loading_show">
+                    <img src="{% static 'img/loading-sun.gif' %}" alt="">
+                    <p class="loading_context">请 稍 候 ...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <!-- Small modal -->
+    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="smallmodal">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="text-center" style="height: 30px">
+                    <h5 style="margin-top: 15px; font-size: 15px;"><strong>操作成功！</strong></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            btnCloseEvent();
+            btnSaveEvent();
+        })
+
+        function btnCloseEvent() {
+            $("#btn_close").click(function () {
+                $(".error-msg").text("");
+            })
+        }
+
+        //表单提交等待提示
+        function Mask() {
+            $('#loading').css({'display': 'block'});
+        }
+
+        function UnMask() {
+            $('#loading').css({'display': 'none'});
+        }
+
+
+        function btnSaveEvent() {
+            $("#btn_save").click(function () {
+                Mask();
+                $.ajax({
+                    url: "{% url 'project_list' %}",
+                    type: 'post',
+                    data: $("#add_form").serialize(),
+                    dataType: 'JSON',
+                    success: function (res) {
+                        UnMask();
+                        if (res.status) {
+                            $("#myModal").modal("hide")
+                            $("#smallmodal").modal("show")
+                            setTimeout("location.reload()", 888)
+                        } else {
+                            $(".error-msg").text("")
+                            $.each(res.errors, function (name, data) {
+                                $("#id_" + name).next().text(data[0])
+                            })
+                        }
+                    },
+                    error: function () {
+                        UnMask();
+                    },
+                });
+            })
+        }
+    </script>
+
+{% endblock %}

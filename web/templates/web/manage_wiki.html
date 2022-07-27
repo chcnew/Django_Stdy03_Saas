@@ -1,0 +1,204 @@
+{% extends "web/tpls/manage.html" %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/editor-md/css/editormd.preview.min.css' %}">
+{% endblock %}
+
+{% block container %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-6">
+                    <i class="fa fa-book" aria-hidden="true"></i> Wiki文章
+                </div>
+
+                <div class="function col-md-6 text-right">
+                    <a type="button" class="btn btn-success btn-xs"
+                       href="{% url 'wiki_add' project_id=request.tracer.project.id %}">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i> 新建
+                    </a>
+
+                    {% if wiki_row_obj %}
+                        <a type="button" class="btn btn-info btn-xs"
+                           href="{% url "wiki_edit" project_id=request.tracer.project.id wiki_id=wiki_row_obj.id %}">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i> 编辑
+                        </a>
+
+                        <!--删除功能：ajax+模态框-->
+                        <a type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#deleteModal"
+                           href="#">
+                            <i class="fa fa-trash-o" aria-hidden="true"></i> 删除
+                        </a>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-body">
+
+            <div class="col-md-3 title-list">
+                <ul id="catalog"></ul>
+            </div> <!--目录-->
+
+            {% if wiki_row_obj %}
+                <div class="col-md-9">
+                    <div id="previewMarkdown">
+                        <textarea>{{ wiki_row_obj.content }}</textarea>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-md-9 content">
+                    <H4>
+                        <strong>
+                            《<span style="color: {{ request.tracer.project.get_color_display }}">{{ request.tracer.project }}</span>》文档库
+                        </strong>
+                    </H4>
+                    <a href="{% url 'wiki_add' project_id=request.tracer.project.id %}">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i> 新建文档
+                    </a> <!--wiki新建文档提示-->
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <div class="modal-header text-left">
+                    <h4>确定删除？</h4>
+                    <p>注意：一旦删除文档无法恢复！</p>
+                </div>
+                <div class="modal-body text-right">
+                    <a type="button" class="btn btn-default btn-close" data-dismiss="modal">取 消</a>
+                    <a type="button" class="btn btn-danger" id="delete-sure" style="margin-right: 5px;">确 定</a>
+                </div>
+                <div id="loading" class="submit_loading" style="display: none">
+                    <div class="loading_show">
+                        <img src="{% static 'img/loading-sun.gif' %}" alt="">
+                        <p class="loading_context">请 稍 候 ...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- 删除模态框end -->
+
+    <!-- Small modal-提示操作成功 -->
+    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="smallmodal">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="text-center" style="height: 30px">
+                    <h5 style="margin-top: 15px; font-size: 15px;"><strong>操作成功！</strong></h5>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Small modal-提示操作成功 -->
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static 'plugins/editor-md/editormd.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/editor-md/lib/flowchart.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/editor-md/lib/jquery.flowchart.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/editor-md/lib/marked.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/editor-md/lib/prettify.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/editor-md/lib/raphael.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/editor-md/lib/sequence-diagram.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/editor-md/lib/underscore.min.js' %}"></script>
+
+    <script type="text/javascript">
+        //表单提交等待提示
+        function Mask() {
+            $('#loading').css({'display': 'block'});
+        }
+
+        function UnMask() {
+            $('#loading').css({'display': 'none'});
+        }
+
+        //定义全局变量为wiki首页url /web/manage/3/wiki/  后边直接传入文档id
+        var MANAGE_WIKI_URL = "{% url 'manage_wiki' project_id=request.tracer.project.id %}"
+
+        $(function () {
+            initCataclog();
+        })
+
+        //目录
+        function initCataclog() {
+            $.ajax({
+                url: "{% url "wiki_catalog" project_id=request.tracer.project.id %}",
+                type: 'get',
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res.status) {
+                        $.each(res.data, function (index, item) {
+                            //console.log(item.id)
+                            var href = MANAGE_WIKI_URL + "?wiki_id=" + item.id
+                            var li = $("<li>").attr("id", "id_" + item.id).append($("<a>").attr("href", href).text(item.title)).append($("<ul>"));
+                            if (!item.parent) {
+                                //无父目录的对象
+                                $("#catalog").append(li);
+                            } else { //有父目录的对象直接加到父目录对象的后面
+                                $("#id_" + item.parent).children("ul").append(li);
+                            }
+                        });
+                    } else {
+                        alert("初始化目录列表失败，请重新进入...");
+                    }
+                }
+            })
+        }
+    </script>
+
+    {% if wiki_row_obj %}
+        <script type="text/javascript">
+            $(function () {
+                deleteWiki();
+                initPreviewMarkwon();
+            })
+
+            //预览
+            function initPreviewMarkwon() {
+                editormd.markdownToHTML("previewMarkdown", {
+                    htmlDebode: "style,script,iframe",
+                });
+            }
+
+
+            //删除wiki
+            function deleteWiki() {
+                $("#delete-sure").click(function () {
+                    Mask();
+                    $.ajax({
+                        url: "{% url 'wiki_delete' project_id=request.tracer.project.id wiki_id=wiki_row_obj.id %}",
+                        type: 'get',
+                        dataType: 'JSON',
+                        success: function (res) {
+                            UnMask();
+                            if (res.status) {
+                                //alert("删除成功！")
+                                $("#smallmodal").modal("show");
+                                setTimeout('location.href = "{% url "manage_wiki" project_id=request.tracer.project.id %}"', 888);
+
+                            } else {
+                                alert("删除错误，该文档不存在！");
+                            }
+                        },
+                        error: function () {
+                            UnMask();
+                        },
+                    });
+                })
+            }
+        </script>
+    {% endif %}
+
+{% endblock %}

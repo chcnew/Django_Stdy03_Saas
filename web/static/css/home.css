@@ -1,0 +1,54 @@
+body img {
+    width: 100%;
+}
+
+/* 改bootstrap样式 */
+.navbar-default {
+    border-radius: 0;
+    text-align: center;
+    background-color: #dff0d8;
+}
+
+.navbar-default .navbar-brand {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand:focus {
+    /*color: black;*/
+    background-color: #e6f7df;
+    border-radius: 5px;
+}
+
+.navbar-default .navbar-nav {
+    margin: 5px;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    /*color: black;*/
+    background-color: #e6f7df;
+    border-radius: 5px;
+}
+
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus {
+    background-color: #e6f7df;
+    border-radius: 5px;
+}
+
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:hover,
+.navbar-default .navbar-nav > .open > a:focus {
+    background-color: #e6f7df;
+    border-radius: 5px;
+}
+
+.navbar-default .navbar-nav > .disabled > a,
+.navbar-default .navbar-nav > .disabled > a:hover,
+.navbar-default .navbar-nav > .disabled > a:focus {
+    background-color: #e6f7df;
+    border-radius: 5px;
+}
+

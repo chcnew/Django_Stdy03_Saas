@@ -1,0 +1,19 @@
+### Django ###
+*.log
+*.pot
+*.pyc
+__pycache__/
+*.sqlite3
+
+### Pycharm ###
+**/.idea/
+.DS_Store
+
+*.py[cod]
+*$py.class
+
+### database migrations ###
+*/migrations/*.py
+
+**/*.xls
+**/*.xlsx

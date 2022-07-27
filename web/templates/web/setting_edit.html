@@ -1,0 +1,31 @@
+{% extends "web/tpls/manage.html" %}
+{% load setting_tage %}
+
+{% block container %}
+    <div class="container clearfix" style="margin-top: 20px; font-size: 16px">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-color:transparent;font-weight: bold;">
+                    项目管理
+                </div>
+                <div class="list-group" style="border-radius: 0; background-color: #f2dede">
+                    {% all_setting_menu request %}  <!--设置导航函数-->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-trash" aria-hidden="true"></i> <strong>编辑项目</strong></div>
+                <div class="panel-body">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function () {$("#setting_menu").attr("class", "myactive");})
+    </script>
+{% endblock %}

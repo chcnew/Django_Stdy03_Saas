@@ -1,0 +1,27 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Informal</title>
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap/css/bootstrap.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h3 style="margin-top: 240px">app-Informal登录</h3>
+        <form action="">
+            <div class="form-group">
+                <label for="">用户名</label>
+                <input type="text" placeholder="用户名" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="">密码</label>
+                <input type="text" placeholder="密码" class="form-control">
+            </div>
+        </form>
+        <a href="/informal/user/register/">点击注册</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,268 @@
+{% extends "web/tpls/manage.html" %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'plugins/editor-md/css/editormd.min.css' %}"><!-- 载入datepicker的css -->
+    <link rel="stylesheet" media="screen" href="{% static 'plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css' %}">
+    <link rel="stylesheet" media="screen" href="{% static 'plugins/bootstrap-select/css/bootstrap-select.min.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" style="padding: 20px 0;">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-search" aria-hidden="true"></i> &ensp;筛 选
+                </div>
+                <div class="panel-body filter-area">
+                    筛选选项
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <i class="fa fa-quora" aria-hidden="true"></i> &ensp;问 题
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button type="button" class="btn btn-xs btn-danger" id="clearbtn">清 空</button>
+                            <button type="button" class="btn btn-xs btn-primary" id="savebtn">返 回</button>
+                            <button type="button" class="btn btn-xs btn-success" id="savebtn">保 存</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-left: -20px;margin-right: 10px;margin-top: 10px">
+                    <form id="myform" class="form-horizontal" novalidate style="font-family: '微软雅黑 Light',fangsong">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label for="{{ form.title.id_for_label }}" class="col-md-1 control-label">标题</label>
+                            <div class="col-md-11">
+                                <div>{{ form.title }}</div>
+                                <span class="error-msg"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.issue_type.id_for_label }}"
+                                   class="col-md-1 control-label">类型</label>
+                            <div class="col-md-11">
+                                <div>{{ form.issue_type }}</div>
+                                <span class="error-msg"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.module.id_for_label }}"
+                                   class="col-md-1 control-label">模块</label>
+                            <div class="col-md-11">
+                                <div>{{ form.module }}</div>
+                                <span class="error-msg"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.desc.id_for_label }}"
+                                   class="col-md-1 control-label">描述</label>
+                            <div class="col-md-11">
+                                <div id="editor">
+                                    {{ form.desc }}
+                                </div>
+                                <div class="error-msg"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.status.id_for_label }}" class="col-md-1 control-label" id="sada">状态</label>
+                            <div class="col-md-5 clearfix">
+                                <div>{{ form.status }}</div>
+                                <div class="error-msg"></div>
+                            </div>
+                            <label for=" {{ form.priority.id_for_label }}" class="col-md-1 control-label">优先级</label>
+                            <div class="col-md-5">
+                                <div>{{ form.priority }}</div>
+                                <div class="error-msg"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.receiver.id_for_label }}" class="col-md-1 control-label" id="sada">接收者</label>
+                            <div class="col-md-5">
+                                <div>{{ form.receiver }}</div>
+                                <div class="error-msg"></div>
+                            </div>
+                            <label for=" {{ form.follower.id_for_label }}" class="col-md-1 control-label">关注者</label>
+                            <div class="col-md-5">
+                                <div>{{ form.follower }}</div>
+                                <div class="error-msg"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="{{ form.mode.id_for_label }}" class="col-md-1 control-label" id="sada">模式</label>
+                            <div class="col-md-5">
+                                <div>{{ form.mode }}</div>
+                                <div class="error-msg"></div>
+                            </div>
+                            <label for=" {{ form.parent.id_for_label }}" class="col-md-1 control-label">父问题</label>
+                            <div class="col-md-5">
+                                <div>{{ form.parent }}</div>
+                                <div class="error-msg"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.start_time.id_for_label }}" class="col-md-1 control-label" style="margin-top: -10px;">
+                                开始<br/>时间
+                            </label>
+                            <div class="col-md-5">
+                                <div>{{ form.start_time }}</div>
+                                <div class="error-msg"></div>
+                            </div>
+
+
+                            <label for=" {{ form.end_time.id_for_label }}" class="col-md-1 control-label" style="margin-top: -10px;">
+                                结束<br/>时间
+                            </label>
+                            <div class="col-md-5">
+                                <div>{{ form.end_time }}</div>
+                                <div class="error-msg"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static 'plugins/editor-md/editormd.min.js' %}"></script>
+    <!--时间插件-->
+    <script type="text/javascript" src="{% static 'plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'plugins/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js' %}" charset="UTF-8"></script>
+    <!--选择插件-->
+    <script type="text/javascript" src="{% static 'plugins/bootstrap-select/js/bootstrap-select.min.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'plugins/bootstrap-select/js/i18n/defaults-zh_CN.min.js' %}" charset="UTF-8"></script>
+
+
+    <script>
+        var EDIT_IID;
+        var WIKI_UPLOAD_URL = "{% url 'wiki_upload' project_id=request.tracer.project.id %}";
+        var ISSUE_MANAGE_URL = "{% url 'manage_issue' project_id=request.tracer.project.id %}";
+
+        $(function () {
+            bindAddbtn();
+            bindSavebtn();
+            bindClosebtn();
+            initEditorMd();
+            initIssueTime();
+        })
+
+        //选择时间样式
+        function initIssueTime() {
+            $("#id_start_time").datetimepicker({
+                format: 'yyyy-mm-dd hh:mm:ss',//显示格式
+                language: "zh-CN",//语言
+                autoclose: true,//选择后自动关闭
+                todayHighlight: true,//高亮显示今日
+                pickerPosition: "top-right",
+            });
+
+            $("#id_end_time").datetimepicker({
+                format: 'yyyy-mm-dd hh:mm:ss',//显示格式
+                language: "zh-CN",//语言
+                autoclose: true,//选择后自动关闭
+                todayHighlight: true,//高亮显示今日
+                pickerPosition: "top-right",
+            });
+        }
+
+        //Markdown初始化
+        function initEditorMd() {
+            editormd("editor", {
+                    placeholder: "Markdown Editor",
+                    width: "auto",
+                    height: 382, //指定高度
+                    //theme: "dark",
+                    watch: false,
+                    path: "{% static 'plugins/editor-md/lib/' %}",  //必须指定依赖文件位置（切记最后/结尾）
+                    imageUpload: true,  //显示本地上传按钮
+                    imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],  //可以上传的文件类型
+                    imageUploadURL: WIKI_UPLOAD_URL,  //上传url，post请求
+                    htmlDecode: "style,script,iframe|on*",
+                    codeFold: true,//折叠代码块
+                    /*指定需要显示的功能按钮*/
+                    toolbarIcons: function () {
+                        return ["undo", "redo", "|",
+                            "bold", "del", "italic", "quote", "uppercase", "lowercase", "|",
+                            "h1", "h2", "h3", "h4", "h5", "h6", "|",
+                            "list-ul", "list-ol", "hr", "|",
+                            "watch", "preview","fullscreen", "image", "|",
+                            "help", "info"]
+                    },
+                }
+            );
+        }
+
+        //新建问题
+        function bindAddbtn() {
+            $(".add_btn").click(function () {
+                $("#myform")[0].reset();
+                $("#mybigmodal").modal("show")
+            })
+        }
+
+        //模态框保存
+        function bindSavebtn() {
+            $("#savebtn").click(function () {
+                if (EDIT_IID) {
+                    //编辑
+                    doEdit();
+                } else {
+                    //添加
+                    doAdd();
+                }
+            });
+        }
+
+        //模态框关闭
+        function bindClosebtn() {
+            $("#closebtn").click(function () {
+                $(".error-msg").text("");
+            })
+        }
+
+        //新建问题提交数据
+        function doAdd() {
+            $.ajax({
+                url: ISSUE_MANAGE_URL,
+                type: "post",
+                data: $("#myform").serialize(),
+                dataType: "JSON",
+                success: function (res) {
+                    console.log(res)
+                    if (res.status) {
+                        $("#mybigModal").modal("hide")
+                        $("#smallmodal").modal("show")
+                        setTimeout("location.reload()", 888)
+                    } else {
+                        $(".error-msg").text("")
+                        $.each(res.errors, function (name, data) {
+                            if (name === "desc" || name === "title") {
+                                $("#id_" + name).parent().next('.error-msg').text(data[0]);
+                            } else {
+                                $("#id_" + name).parent().parent().next('.error-msg').text(data[0]);
+                            }
+                        })
+                    }
+                },
+            });
+        }
+
+    </script>
+{% endblock %}

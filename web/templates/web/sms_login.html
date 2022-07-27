@@ -1,0 +1,122 @@
+{% extends 'web/tpls/layout.html' %}
+{% load static %}
+
+{% block title %}/短信登录{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/reglogin.css' %}">
+{% endblock %}
+
+{% block container %}
+    <div class="account">
+        <form class="row-no-gutters form-set-input" id="sms_form" novalidate>
+            {% csrf_token %}
+            <h2 class="form-signin-heading text-center">登 录</h2>
+            {% for field in form %}
+                {% if field.name != "smscode" %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}<span class="error-msg"></span>
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        <div class="row-no-gutters clearfix">
+                            <div class="col-md-6">{{ field }}<span class="error-msg"></span></div>
+                            <div class="col-md-6 text-right">
+                                <input type="button" class="btn btn-group-sm btn-default" value="点击获取验证码" id="getcode">
+                            </div>
+                            <span class="error-msg"></span>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </form>
+        <div class="form-signin">
+            <button class="btn btn-lg btn-primary btn-block subbtn form-set-input" id="subbtn">登 录</button>
+        </div>
+        <div class="form-signin row-no-gutters">
+            <div class="col-md-6 text-left">
+                <a href="{% url 'user_register' %}">没有帐号,点击注册!</a>
+            </div>
+            <div class="col-md-6 text-right">
+                <a href="{% url 'user_login' %}">使用密码登录？</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            btn1Event()
+            btn3Event()
+        })
+
+        /* 点击获取验证码按钮 */
+        function btn1Event() {
+            $("#getcode").click(function () {
+                $(".error-msg").text("")
+                $.ajax({
+                    url: "{% url 'get_sms' %}",
+                    type: 'post',
+                    data: {
+                        'tpl': 'login',
+                        'phone': $('#id_phone').val(),
+                    },
+                    dataType: 'JSON',
+                    success: function (res) {
+                        if (res.status) {
+                            $(function () {
+                                btn2Event()
+                            });
+                        } else {
+                            $.each(res.errors, function (name, data) {
+                                $("#id_" + name).next().text(data[0])
+                            })
+                        }
+                    }
+                })
+            })
+        }
+
+        /* 验证码倒计时显示 */
+        function btn2Event() {
+            $("#getcode").prop("disabled", true)
+            var time = 60
+            var remind = setInterval(function () {
+                time = time - 1;
+                $("#getcode").val(time + "秒重新获取");
+                if (time < 1) {
+                    $('#getcode').val("点击获取验证码").prop("disabled", false);
+                    clearInterval(remind)
+                }
+            }, 1000)
+        }
+
+
+        /* 点击登录按钮 */
+        function btn3Event() {
+            $("#subbtn").click(function () {
+                $(".error-msg").text("")
+                $.ajax({
+                    url: "{% url 'sms_login' %}",
+                    type: 'post',
+                    data: $("#sms_form").serialize(),
+                    dataType: 'JSON',
+                    success: function (res) {
+                        if (res.status) {
+                            alert("登录成功！")
+                            location.href = "{% url 'project_list' %}"
+                        } else {
+                            $.each(res.errors, function (name, data) {
+                                $("#id_" + name).next().text(data[0])
+                            })
+                        }
+                    }
+                })
+            })
+        }
+
+    </script>
+{% endblock %}

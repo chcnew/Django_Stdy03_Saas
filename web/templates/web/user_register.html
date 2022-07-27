@@ -1,0 +1,118 @@
+{% extends 'web/tpls/layout.html' %}
+{% load static %}
+
+{% block title %}/用户注册{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/reglogin.css' %}">
+{% endblock %}
+
+{% block container %}
+    <div class="account">
+        <form class="row-no-gutters form-set-input" id="register_form" novalidate>
+            <h2 class="form-signin-heading text-center">注册新用户</h2>
+            {% csrf_token %}
+            {% for field in form %}
+                {% if field.name != "smscode" %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}<span class="error-msg"></span>
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        <div class="row-no-gutters clearfix">
+                            <div class="col-md-6">{{ field }}<span class="error-msg"></span></div>
+                            <div class="col-md-6 text-right">
+                                <input type="button" class="btn btn-group-sm btn-default" value="点击获取验证码" id="getcode">
+                            </div>
+                            <span class="error-msg"></span>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </form>
+        <div class="form-signin">
+            <button class="btn btn-lg btn-primary btn-block subbtn form-set-input" id="subbtn">注 册</button>
+            <span class="error-msg" id="none_error"></span>
+        </div>
+        <div class="col-md-12 text-center" style="margin-top: 10px">
+            <a href="{% url 'sms_login' %}">已有帐号,返回登录!</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            btn1Event()
+            btn3Event()
+        });
+
+        /* 点击获取验证码按钮 */
+        function btn1Event() {
+            $("#getcode").click(function () {
+                $(".error-msg").text("")
+                $.ajax({
+                    url: "{% url 'get_sms' %}",
+                    type: 'post',
+                    data: {
+                        'tpl': 'register',
+                        'phone': $('#id_phone').val(),
+                    },
+                    dataType: 'JSON',
+                    success: function (res) {
+                        if (res.status) {
+                            $(function () {
+                                btn2Event()
+                            });
+                        } else {
+                            $.each(res.errors, function (name, data) {
+                                $("#id_" + name).next().text(data[0])
+                            })
+                        }
+                    }
+                })
+            })
+        }
+
+        /* 验证码倒计时显示 */
+        function btn2Event() {
+            $("#getcode").prop("disabled", true)
+            var time = 60
+            var remind = setInterval(function () {
+                time = time - 1;
+                $("#getcode").val(time + "秒重新获取");
+                if (time < 1) {
+                    $('#getcode').val("点击获取验证码").prop("disabled", false);
+                    clearInterval(remind)
+                }
+            }, 1000)
+        }
+
+
+        /* 点击注册按钮 */
+        function btn3Event() {
+            $("#subbtn").click(function () {
+                $(".error-msg").text("")
+                $.ajax({
+                    url: "{% url 'user_register' %}",
+                    type: 'post',
+                    data: $("#register_form").serialize(),
+                    dataType: 'JSON',
+                    success: function (res) {
+                        if (res.status) {
+                            alert("注册成功！")
+                            location.href = "{% url "user_login" %}"
+                        } else {
+                            $.each(res.errors, function (name, data) {
+                                $("#id_" + name).next().text(data[0])
+                            })
+                            $("#none_error").text(res.price_policy_error)
+                        }
+                    }
+                })
+            })
+        }
+    </script>
+{% endblock %}

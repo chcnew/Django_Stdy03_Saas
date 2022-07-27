@@ -1,0 +1,88 @@
+{% load project_tage %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <!-- 使用X-UA-Compatible设置IE兼容模式 最新渲染模式 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SAAS平台{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/font-awesome/css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'css/manage.css' %}">
+    {% block css %}{% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'project_list' %}">TRACER平台</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        {% if request.tracer.project %}
+                            <i class="fa fa-circle" aria-hidden="true"></i>&ensp;项目（{{ request.tracer.project.project_name }}）<span class="caret"></span>
+                        {% else %}
+                            <i class="fa fa-circle" aria-hidden="true"></i>&ensp;选择项目<span class="caret"></span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% all_project_list request %} <!--tage：选择项目列表菜单 -->
+                    </ul>
+                    {% if request.tracer.project %}
+                        {% all_project_menu request %}
+                    {% endif %} <!--tage：进入项目后菜单 -->
+                </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">工作台</a></li>
+                <li><a href="#">日历</a></li>
+                <li><a href="#"><i class="fa fa-bell" aria-hidden="true"></i></a></li>
+                <li><a href="#"><i class="fa fa-bookmark" aria-hidden="true"></i></a></li>
+
+                {% if not request.session.userinfo.username %}
+                    <li><a href="{% url 'sms_login' %}">登 录</a></li>
+                    <li><a href="{% url 'user_register' %}">注 册</a></li>
+                {% else %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ request.session.userinfo.username }} <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{% url "home_index" %}">官方首页</a></li>
+                            <li><a href="{% url "user_setting" %}">个人中心</a></li>
+                            <li><a href="{% url 'user_logout' %}">注销登录</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav> <!--导航条-->
+
+<div class="container-fluid">{% block container %}{% endblock %}</div>
+
+{% block content %}{% endblock %}
+</body>
+
+<!-- 载入bootstrap-datepicker的js -->
+<!-- 如果使用插件，必须引入jQuery -->
+<script type="text/javascript" src="{% static 'plugins/jquery/jquery-3.6.0.min.js' %}"></script>
+<!-- 包括所有的bootstrap的js插件或者可以根据需要调用js插件调用 -->
+<script type="text/javascript" src="{% static 'plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+<!-- 腾讯cos -->
+<script type="text/javascript" src="{% static 'plugins/cos-js-sdk-v5/cos-js-sdk-v5.min.js' %}"></script>
+
+{% block js %}{% endblock %}
+</html>

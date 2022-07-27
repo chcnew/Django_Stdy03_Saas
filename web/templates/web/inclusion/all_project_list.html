@@ -1,0 +1,28 @@
+<li><i class="fa fa-list-alt" aria-hidden="true"></i> 我的创建</li>
+{% if my_create_list %}
+    {% for item in my_create_list %}
+        <li><a href="{% url "manage_dashboard" project_id=item.id %}"><i class="fa fa-circle" aria-hidden="true"></i> {{ item.project_name }}</a></li>
+    {% endfor %}
+{% endif %}
+
+
+{% if my_join_list %}
+    <li role="separator" class="divider"></li>
+    <li><i class="fa fa-list" aria-hidden="true"></i> 我的参与</li>
+
+    {% for item in my_join_list %}
+        <li><a href="{% url "manage_dashboard" project_id=item.project.id %}"><i class="fa fa-circle" aria-hidden="true"></i> {{ item.project.project_name }}</a></li>
+    {% endfor %}
+
+{% endif %}
+
+
+<li role="separator" class="divider"></li>
+<li><i class="fa fa-list" aria-hidden="true"></i> 所有项目</li>
+{% for item in all_list %}
+    <li><a href="{% url "manage_dashboard" project_id=item.id %}"><i class="fa fa-circle" aria-hidden="true"></i> {{ item.project_name }}</a></li>
+    {% if my_join_list.count > 10 %}
+        <li><a href="{% url 'project_list' %}"> 更多... </a></li>
+    {% endif %}
+{% endfor %}
+

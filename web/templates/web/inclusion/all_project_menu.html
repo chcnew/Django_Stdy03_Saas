@@ -1,0 +1,6 @@
+{% for item in data_lst %}
+    <li >
+        <a {% if item.class %} class="myactive" {% endif %} href="{{ item.url }}"
+           {% if item.title == "设置" %}id="setting_menu"{% endif %}>{{ item.title }}</a>
+    </li>
+{% endfor %}

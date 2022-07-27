@@ -1,0 +1,139 @@
+{% extends "web/tpls/manage.html" %}
+{% load static %}
+{% load setting_tage %}
+
+{% block container %}
+    <div class="container clearfix" style="margin-top: 20px; font-size: 16px">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-color:transparent;font-weight: bold;">
+                    项目管理
+                </div>
+                <div class="list-group" style="border-radius: 0; background-color: #f2dede">
+                    {% all_setting_menu request %}  <!--设置导航函数-->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-trash" aria-hidden="true"></i> <strong>删除项目</strong></div>
+
+                <div class="panel-body" style="padding: 30px">
+                    <form class="col-md-6 text-left" style="padding: 0" novalidate id="delete_form">
+                        {% csrf_token %}
+                        <div class="col-md-3" style="padding: 0; margin-top: 8px">
+                            <label for="project_name">项目名称</label>
+                        </div>
+                        <div class="col-md-9" style="padding-left:0;">
+                            {{ form.project_name }}
+                            <span class="error-msg"></span>
+                        </div>
+                    </form>
+                    <button class="btn btn-danger delete_btn">删 除</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!--Modal-删除模态框-->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <div class="modal-header text-left">
+                    <h4>确定删除？</h4>
+                    <p>注意：删除项目则项目包含的文件及文件夹将全部删除！</p>
+                </div>
+                <div class="modal-body text-right">
+                    <a type="button" class="btn btn-default btn-close" data-dismiss="modal">取 消</a>
+                    <a type="button" class="btn btn-danger" id="delete-sure" style="margin-right: 5px;">确 定</a>
+                </div>
+                <div id="loading" class="submit_loading" style="display: none">
+                    <div class="loading_show">
+                        <img src="{% static 'img/loading-sun.gif' %}" alt="">
+                        <p class="loading_context">请 稍 候 ...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!--删除模态框-->
+    <!-- Small modal-提示操作成功 -->
+    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="smallmodal">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="text-center" style="height: 30px">
+                    <h5 style="margin-top: 15px; font-size: 15px;"><strong>操作成功！</strong></h5>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Small modal-提示操作成功 -->
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        //表单提交等待提示
+        function Mask() {
+            $('#loading').css({'display': 'block'});
+        }
+
+        function UnMask() {
+            $('#loading').css({'display': 'none'});
+        }
+
+        $(function () {
+            bindCheckDelete();
+            bindDeleteSure();
+            $("#setting_menu").attr("class", "myactive");
+        })
+
+
+        function bindCheckDelete() {
+            $(".delete_btn").click(function () {
+                $.ajax({
+                    url: "{% url 'setting_delete' project_id=request.tracer.project.id %}",
+                    type: 'post',
+                    data: $("#delete_form").serialize(),
+                    dataType: 'JSON',
+                    success: function (res) {
+                        if (res.status) {
+                            //alert("项目校验成功！确定删除？")
+                            $("#deleteModal").modal("show");
+                        } else {
+                            //console.log(res);
+                            $.each(res.errors, function (name, data) {
+                                $("#id_" + name).next().text(data[0])
+                            });
+                        }
+                    },
+                });
+            })
+        }
+
+        function bindDeleteSure() {
+            $("#delete-sure").click(function () {
+                Mask()
+                $.ajax({
+                    url: "{% url 'setting_delete_sure' project_id=request.tracer.project.id %}",
+                    type: 'post',
+                    data: $("#delete_form").serialize(),
+                    dataType: 'JSON',
+                    success: function (res) {
+                        UnMask();
+                        $("#deleteModal").modal("hide")
+                        if (res.status) {
+                            $(".error-msg").text("");
+                            $("#delete_form")[0].reset();
+                            $("#smallmodal").modal("show")
+                            setTimeout('location.href = "{% url 'project_list' %}"', 888)
+                        } else {
+                            alert(res.error)
+                        }
+                    },
+                });
+            })
+        }
+
+    </script>
+{% endblock %}

@@ -1,0 +1,117 @@
+body {
+    background-color: #eee;
+    background-image: url("../img/loginbg.png");
+}
+
+/* 错误信息提示 */
+span.error-msg {
+    color: #e41106;
+    font-weight: bolder;
+    font-size: 10px;
+    position: absolute;
+}
+
+a{
+    color: blue;
+}
+
+.form-signin {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+    margin-top: 5px;
+}
+
+.form-signin .checkbox {
+    font-weight: 400;
+}
+
+.form-signin .form-control {
+    position: relative;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: auto;
+    padding: 8px;
+    font-size: 14px;
+}
+
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+
+.form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.account {
+    width: 440px;
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    box-shadow: 5px 5px 20px #aaa;
+    background-color: rgba(255, 255, 255, .5);
+
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 60px;
+    padding: 50px 40px;
+}
+
+.form-set-input {
+    width: 300px;
+    margin: auto;
+}
+
+/* 验证码样式 */
+.imgcode {
+    border-radius: 2px;
+    border: 1px;
+    width: 105px;
+    height: 30px;
+    margin-top: 27px;
+}
+
+
+/* 改bootstrap样式 */
+.navbar-default {
+    border-radius: 0;
+    text-align: center;
+    background-color: #dff0d8;
+}
+
+.navbar-default .navbar-brand {
+    margin-top: 4px;
+    margin-bottom:4px;
+}
+
+.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand:focus {
+    color: black;
+    background-color: #e6f7df;
+    border-radius: 5px;
+}
+
+.navbar-default .navbar-nav{
+    margin-top: 5px;
+    margin-bottom:5px;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    color: black;
+    background-color: #e6f7df;
+    border-radius: 5px;
+
+}
