@@ -9,7 +9,7 @@ __pycache__/
 **/.idea/
 .DS_Store
 
-*.py[cod]
+*.py[cod]s
 *$py.class
 
 ### database migrations ###
@@ -17,4 +17,4 @@ __pycache__/
 
 **/*.xls
 **/*.xlsx
-**/local_settings.py
+**/local_settings_bak.py
